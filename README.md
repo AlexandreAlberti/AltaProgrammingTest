@@ -14,5 +14,5 @@
 
 # Edit 1
 I added Dockerfile and some github Actions to allow usage of containers and automatic releases on master branch pushes. Also added a diagram on how to deploy to allow creating multiple instances of server.
-![Diagram]([https://github.com/AlexandreAlberti/AltaProgrammingTest/blob/master/Diagram.png])
+![Diagram](https://github.com/AlexandreAlberti/AltaProgrammingTest/blob/master/Diagram.png?raw=true)
 The main idea is to have a load balancer for request, which has to know all up and running server instances. Using a tool like AWS Cloudformation (https://aws.amazon.com/cloudformation), we can dinamically set up the amount of needed server instances and deploy more or less based on usage, also it offers possibility to configure Load Balancer (https://aws.amazon.com/elasticloadbalancing/). I assume that we all know how this works. AWS already offers a way for Balancer to know all up and running instances, so configuration is minimal. I also assume that any other cloud provider will have similar tools. AWS is one that I used when worked at Adevinta/Schibsted.
