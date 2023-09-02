@@ -21,9 +21,6 @@ jobs:
         with:
           tag_name: alta_test_release_${{  github.ref_name }}
           release_name: Release alta_test_release_${{  github.ref_name }}
-          body: |
-            Changes in this Release
-            - First Change
-            - Second Change
+          body: Automatic Release Message for alta_test_release_${{  github.ref_name }}
           draft: false
           prerelease: false
