@@ -19,8 +19,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
-          tag_name: alta_test_release_0.0.${{  github.run_attempt  }}
-          release_name: Release alta_test_release_0.0.${{  github.run_attempt  }}
-          body: Automatic Release Message for alta_test_release_0.0.${{  github.run_attempt  }}
+          tag_name: alta_test_release_0.0.${{  github.run_number  }}
+          release_name: Release alta_test_release_0.0.${{  github.run_number  }}
+          body: Automatic Release Message for alta_test_release_0.0.${{  github.run_number  }}
           draft: false
           prerelease: false
