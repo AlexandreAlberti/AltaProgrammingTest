@@ -13,6 +13,14 @@
 - Thanks for the time spent evaluating my work. It was quite enjoyable to face this challange and I hope to be challanged more.
 
 # Edit 1
-I added Dockerfile and some github Actions to allow usage of containers and automatic releases on master branch pushes. Also added a diagram on how to deploy to allow creating multiple instances of server.
-![Diagram]([https://github.com/AlexandreAlberti/AltaProgrammingTest/blob/master/Diagram.png])
-The main idea is to have a load balancer for request, which has to know all up and running server instances. Using a tool like AWS Cloudformation (https://aws.amazon.com/cloudformation), we can dinamically set up the amount of needed server instances and deploy more or less based on usage, also it offers possibility to configure Load Balancer (https://aws.amazon.com/elasticloadbalancing/). I assume that we all know how this works. AWS already offers a way for Balancer to know all up and running instances, so configuration is minimal. I also assume that any other cloud provider will have similar tools. AWS is one that I used when worked at Adevinta/Schibsted.
+- In this revision of the test task I upgraded to net5.0, instead of netcoreapp3.1.
+- I added Dockerfile and some github Actions to allow usage of containers and automatic releases on master branch pushes. 
+- Also added a diagram on how to deploy to allow creating multiple instances of server. ![Diagram]([https://github.com/AlexandreAlberti/AltaProgrammingTest/blob/master/Diagram.png]) The main idea is to have a load balancer for request, which has to know all up and running server instances. Using a tool like AWS Cloudformation (https://aws.amazon.com/cloudformation), we can dinamically set up the amount of needed server instances and deploy more or less based on usage, also it offers possibility to configure Load Balancer (https://aws.amazon.com/elasticloadbalancing/). I assume that we all know how this works. AWS already offers a way for Balancer to know all up and running instances, so configuration is minimal. I also assume that any other cloud provider will have similar tools. AWS is one that I used when worked at Adevinta/Schibsted.
+- This things mentioned before can make the first work on the test without taking the feedback already received into account.
+
+# Edit 2
+- Now I'm taking the feedback into account.
+- Added more specific update fields methods on Service's Layer with non critical values. Also, as we can update some fields on a property at once with some checks and using an enum Loop with a SET kind to avoid duplications in the loop and avoid updating other values (I decided instead of only updating some values because it's easier to understand we only want to update some fields, when it becomes old code, will be easier to understand).
+- Removed all var properties type, as suggested.
+- Renamed a bit variables to be more verbose.
+- Created method "transaction" in purchasesController to allow move property ownership between user accounts. Also with a flag to tell they used custom price, so we can update balance of both users accordingly if that's the case. 

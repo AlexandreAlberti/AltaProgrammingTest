@@ -7,23 +7,23 @@ namespace ApiProgrammingTest.Controllers
     [ApiController]
     public class AccountsController : ControllerBase
     {
-        readonly Services.IAccountsService service;
+        readonly Services.IAccountsService accountService;
 
         public AccountsController(Services.IAccountsService service)
         {
-            this.service = service;
+            this.accountService = service;
         }
 
         [HttpGet]
         public IEnumerable<AccountInfo> Get()
         {
-            return service.Get();
+            return accountService.Get();
         }
 
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
-            var account = service.Get(id);
+            AccountInfo account = accountService.Get(id);
 
             if (account == null)
             {
@@ -36,19 +36,20 @@ namespace ApiProgrammingTest.Controllers
         [HttpPost]
         public void CreateAccount([FromBody] AccountInfo request)
         {
-            service.CreateAccount(request.Name);
+            accountService.CreateAccount(request.Name);
         }
 
         [HttpPut("{id}")]
         public IActionResult UpdateAccount(int id, [FromBody] AccountInfo account)
         {
-            var accountInfo = service.Get(id);
+            AccountInfo accountInfo = accountService.Get(id);
 
             if (accountInfo == null)
             {
                 return NotFound();
             }
-            if (service.UpdateAccount(id, account.Name, service.Upkeep(id), accountInfo.Purchases))
+            accountService.UpdateBalanceFromAccountUsingOwnedProperties(id);
+            if (accountService.UpdateAccountName(id, account.Name))
             {
                 return NotFound();
             }
@@ -59,7 +60,7 @@ namespace ApiProgrammingTest.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeleteAccount(int id)
         {
-            if (service.DeleteAccount(id))
+            if (accountService.DeleteAccount(id))
             {
                 return NoContent();
             }

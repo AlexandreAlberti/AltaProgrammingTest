@@ -41,7 +41,7 @@ namespace ApiProgrammingTest_TestMS
             contextMock.Setup(mock => mock.SaveChanges()).Callback(() => { }); // Do nothing
             ApiProgrammingTest.Services.IAccountsService service = new ApiProgrammingTest.Services.AccountsService(contextMock.Object);
 
-            Assert.AreEqual(51_000, (int) service.Upkeep(1)); // Starting Balance + 1h complete from Revenue (no decimal wanted)
+            Assert.AreEqual(51_000, (int) service.UpdateBalanceFromAccountUsingOwnedProperties(1)); // Starting Balance + 1h complete from Revenue (no decimal wanted)
         }
     }
 }

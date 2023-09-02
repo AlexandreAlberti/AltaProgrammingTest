@@ -14,9 +14,9 @@ namespace ApiProgrammingTest.Controllers
         }
 
         [HttpPost("buy")]
-        public IActionResult Purchase([FromBody] PurchaseInfo purchase)
+        public IActionResult Purchase([FromBody] PurchaseInfo buyActionInfo)
         {
-            if (!service.Buy(purchase))
+            if (!service.Buy(buyActionInfo))
             {
                 // No property or not available for purchase
                 return NoContent();
@@ -25,9 +25,20 @@ namespace ApiProgrammingTest.Controllers
         }
 
         [HttpPost("sell")]
-        public IActionResult Sell([FromBody] PurchaseInfo purchase)
+        public IActionResult Sell([FromBody] PurchaseInfo sellActionInfo)
         {
-            if (!service.Sell(purchase))
+            if (!service.Sell(sellActionInfo))
+            {
+                // No property or not available for purchase
+                return NoContent();
+            }
+            return Ok();
+        }
+
+        [HttpPost("transaction")]
+        public IActionResult Transaction([FromBody] TransactionBetweenAccounts transactionBetweenAccounts)
+        {
+            if (!service.TransactonBetweenAccounts(transactionBetweenAccounts))
             {
                 // No property or not available for purchase
                 return NoContent();

@@ -5,7 +5,7 @@ namespace ApiProgrammingTest.Services
 {
     public class AccountsService : IAccountsService
     {
-        static readonly long MIN_TIME_TO_UPKEEP = 300_000; // Not do Upkeep more than once per 5 minute
+        static readonly long MIN_TIME_TO_UPKEEP = 300_000; // Not do UpdateBalanceFromAccountUsingOwnedProperties more than once per 5 minute
         static readonly long MILLIS_IN_HOUR = 3_600_000; // 60min/h * 60sec/min * 1000ms/s
         readonly PropertyMogulContext context;
 
@@ -23,9 +23,9 @@ namespace ApiProgrammingTest.Services
             List<int> purchases = new List<int>();
             if (info.Purchases.Length > 0)
             {
-                foreach (string s in info.Purchases.Split(","))
+                foreach (string propertyString in info.Purchases.Split(","))
                 {
-                    purchases.Add(Int32.Parse(s));
+                    purchases.Add(Int32.Parse(propertyString));
                 }
             }
             return new AccountInfo()
@@ -45,7 +45,7 @@ namespace ApiProgrammingTest.Services
             List<AccountInfo> returnlist = new List<AccountInfo>();
             foreach (AccountInfoDB ac in context.Accounts)
             {
-                Upkeep(ac.Id);
+                UpdateBalanceFromAccountUsingOwnedProperties(ac.Id);
                 returnlist.Add(Transform(ac));
             }
 
@@ -54,7 +54,7 @@ namespace ApiProgrammingTest.Services
 
         public AccountInfo Get(int id)
         {
-            Upkeep(id);
+            UpdateBalanceFromAccountUsingOwnedProperties(id);
             return Transform(context.Accounts.Find(id));
         }
 
@@ -76,11 +76,43 @@ namespace ApiProgrammingTest.Services
             context.SaveChanges();
         }
 
-        public bool UpdateAccount(int id, string name, decimal balance, List<int> properties)
+        public bool UpdateAccountName(int id, string name)
         {
-            var existing = context.Accounts.Find(id);
+            AccountInfoDB existingAccount = context.Accounts.Find(id);
 
-            if (existing == null)
+            if (existingAccount == null)
+            {
+                return false;
+            }
+            existingAccount.Name = name;
+            context.Accounts.Update(existingAccount);
+            context.SaveChanges();
+
+            return true;
+        }
+
+        public bool UpdateAccountBalance(int id, decimal balance)
+        {
+            AccountInfoDB existingAccount = context.Accounts.Find(id);
+
+            if (existingAccount == null)
+            {
+                return false;
+            }
+
+            existingAccount.Balance = balance;
+
+            context.Accounts.Update(existingAccount);
+            context.SaveChanges();
+
+            return true;
+        }
+
+        public bool UpdateAccountProperties(int id, List<int> properties)
+        {
+            AccountInfoDB existingAccount = context.Accounts.Find(id);
+
+            if (existingAccount == null)
             {
                 return false;
             }
@@ -95,11 +127,36 @@ namespace ApiProgrammingTest.Services
                 props += properties[i];
             }
 
-            existing.Name = name;
-            existing.Balance = balance;
-            existing.Purchases = props;
+            existingAccount.Purchases = props;
 
-            context.Accounts.Update(existing);
+            context.Accounts.Update(existingAccount);
+            context.SaveChanges();
+
+            return true;
+        }
+        public bool UpdateAccountBalanceAndProperties(int id, decimal balance, List<int> properties)
+        {
+            AccountInfoDB existingAccount = context.Accounts.Find(id);
+
+            if (existingAccount == null)
+            {
+                return false;
+            }
+
+            string propertiesString = "";
+            for (int i = 0; i < properties.Count; i++)
+            {
+                if (i > 0)
+                {
+                    propertiesString += ",";
+                }
+                propertiesString += properties[i];
+            }
+
+            existingAccount.Balance = balance;
+            existingAccount.Purchases = propertiesString;
+
+            context.Accounts.Update(existingAccount);
             context.SaveChanges();
 
             return true;
@@ -107,13 +164,13 @@ namespace ApiProgrammingTest.Services
 
         public bool DeleteAccount(int id)
         {
-            Upkeep(id, true);
-            var existing = context.Accounts.Find(id);
+            UpdateBalanceFromAccountUsingOwnedProperties(id, true);
+            AccountInfoDB existingAccount = context.Accounts.Find(id);
 
-            if (existing != null)
+            if (existingAccount != null)
             {
-                FreeProperties(Transform(existing).Purchases);
-                context.Accounts.Remove(existing);
+                FreeProperties(Transform(existingAccount).Purchases);
+                context.Accounts.Remove(existingAccount);
                 context.SaveChanges();
                 return true;
             }
@@ -125,49 +182,49 @@ namespace ApiProgrammingTest.Services
         {
             foreach (int id in ids)
             {
-                var existing = context.Properties.Find(id);
+                PropertyInfo property = context.Properties.Find(id);
 
-                if (existing == null)
+                if (property == null)
                 {
                     continue;
                 }
 
-                existing.AvailableForPurchase = true;
-                existing.OwnedBy = -1;
-                context.Properties.Update(existing);
+                property.AvailableForPurchase = true;
+                property.OwnedBy = -1;
+                context.Properties.Update(property);
             }
         }
-        public decimal Upkeep(int id)
+        public decimal UpdateBalanceFromAccountUsingOwnedProperties(int id)
         {
-            return Upkeep(id, false);
+            return UpdateBalanceFromAccountUsingOwnedProperties(id, false);
         }
 
-        public decimal Upkeep(int id, bool forced)
+        public decimal UpdateBalanceFromAccountUsingOwnedProperties(int id, bool forced)
         {
-            var accountToUpkeep = Transform(context.Accounts.Find(id));
+            AccountInfo accountToUpkeep = Transform(context.Accounts.Find(id));
             if (accountToUpkeep != null)
             {
-                var timePassed = System.DateTime.UtcNow.Subtract(accountToUpkeep.LastUpdateTime).TotalMilliseconds;
-                if ((timePassed >= MIN_TIME_TO_UPKEEP || forced) && timePassed >= 0)
+                Double timePassedSinceLastUpdate = System.DateTime.UtcNow.Subtract(accountToUpkeep.LastUpdateTime).TotalMilliseconds;
+                if ((timePassedSinceLastUpdate >= MIN_TIME_TO_UPKEEP || forced) && timePassedSinceLastUpdate >= 0)
                 {
-                    decimal hoursPassed = (decimal)timePassed / MILLIS_IN_HOUR;
-                    decimal balance = accountToUpkeep.Balance;
+                    decimal hoursPassed = (decimal)timePassedSinceLastUpdate / MILLIS_IN_HOUR;
+                    decimal newBalance = accountToUpkeep.Balance;
                     if (accountToUpkeep.Purchases != null)
                     {
                         foreach (int propId in accountToUpkeep.Purchases)
                         {
-                            var existing = context.Properties.Find(propId);
+                            PropertyInfo property = context.Properties.Find(propId);
 
-                            if (existing == null)
+                            if (property == null)
                             {
                                 continue;
                             }
 
-                            balance += existing.RevenuePerHour * hoursPassed;
+                            newBalance += property.RevenuePerHour * hoursPassed;
                         }
                     }
-                    UpdateAccount(id, accountToUpkeep.Name, balance, accountToUpkeep.Purchases);
-                    return balance;
+                    UpdateAccountBalance(id, newBalance);
+                    return newBalance;
                 }
                 return accountToUpkeep.Balance;
             }

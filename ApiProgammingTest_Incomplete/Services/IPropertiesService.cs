@@ -8,7 +8,8 @@ namespace ApiProgrammingTest.Services
         public PropertyInfo Get(int id);
         public List<PropertyInfo> Get(List<int> list);
         public void CreateProperty(PropertyInfo property);
-        public bool UpdateProperty(int id, string name, decimal buyPrice, decimal sellPrice, decimal revenue, bool toPurchase, int ownedBy);
+        public bool UpdateProperty(int id, PropertyInfo property, ISet<PropertyUpdatePropietyEnum> updateFields);
+        public bool UpdatePropertyOwnership(int id, bool toPurchase, int ownedBy);
         public bool DeleteProperty(int id);
     }
 }

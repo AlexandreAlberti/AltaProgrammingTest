@@ -4,5 +4,6 @@ namespace ApiProgrammingTest.Services
     {
         public bool Buy(PurchaseInfo info);
         public bool Sell(PurchaseInfo info);
+        public bool TransactonBetweenAccounts(TransactionBetweenAccounts transactionBetweenAccounts);
     }
 }

@@ -36,23 +36,49 @@ namespace ApiProgrammingTest.Services
             context.SaveChanges();
         }
 
-        public bool UpdateProperty(int id, string name, decimal buyPrice, decimal sellPrice, decimal revenue, bool toPurchase, int ownedBy)
+        public bool UpdateProperty(int id, PropertyInfo property, ISet<PropertyUpdatePropietyEnum> updateFields)
         {
-            var existing = context.Properties.Find(id);
+            PropertyInfo propertyFromDB = context.Properties.Find(id);
 
-            if (existing == null)
+            if (propertyFromDB == null)
+            {
+                return false;
+            }
+            foreach (PropertyUpdatePropietyEnum updatePropertyEnum in updateFields)
+            {
+                switch(updatePropertyEnum){
+                    case PropertyUpdatePropietyEnum.BUY_PRICE:
+                        propertyFromDB.BuyPrice = property.BuyPrice;
+                        break;
+                    case PropertyUpdatePropietyEnum.NAME:
+                        propertyFromDB.Name = property.Name;
+                        break;
+                    case PropertyUpdatePropietyEnum.REVENUE_PER_HOUR:
+                        propertyFromDB.RevenuePerHour = property.RevenuePerHour;
+                        break;
+                    case PropertyUpdatePropietyEnum.SELL_PRICE:
+                        propertyFromDB.SellPrice = property.SellPrice;
+                        break;
+                }
+            }
+            context.Update(propertyFromDB);
+            context.SaveChanges();
+            return true;
+        }
+
+        public bool UpdatePropertyOwnership(int id, bool toPurchase, int ownedBy)
+        {
+            PropertyInfo propertyFromDB = context.Properties.Find(id);
+
+            if (propertyFromDB == null)
             {
                 return false;
             }
 
-            existing.Name = name;
-            existing.BuyPrice = buyPrice;
-            existing.SellPrice = sellPrice;
-            existing.RevenuePerHour = revenue;
-            existing.AvailableForPurchase = toPurchase;
-            existing.OwnedBy = ownedBy;
+            propertyFromDB.OwnedBy = ownedBy;
+            propertyFromDB.AvailableForPurchase = toPurchase;
 
-            context.Update(existing);
+            context.Update(propertyFromDB);
             context.SaveChanges();
 
             return true;
@@ -60,12 +86,12 @@ namespace ApiProgrammingTest.Services
 
         public bool DeleteProperty(int id)
         {
-            var existing = context.Properties.Find(id);
+            PropertyInfo propertyFromDB = context.Properties.Find(id);
 
-            if (existing != null)
+            if (propertyFromDB != null)
             {
-                RemoveProperty(existing.OwnedBy, id);
-                context.Properties.Remove(existing);
+                RemoveProperty(propertyFromDB.OwnedBy, id);
+                context.Properties.Remove(propertyFromDB);
                 context.SaveChanges();
                 return true;
             }
@@ -74,15 +100,14 @@ namespace ApiProgrammingTest.Services
 
         private void RemoveProperty(int id, int idProperty)
         {
-            var existing = context.Accounts.Find(id);
+            AccountInfoDB account = context.Accounts.Find(id);
 
-            if (existing == null)
+            if (account == null)
             {
                 return;
             }
-            existing.Purchases.Remove(idProperty);
-            context.Update(existing);
+            account.Purchases.Remove(idProperty);
+            context.Update(account);
         }
-
     }
 }
