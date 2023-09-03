@@ -29,4 +29,6 @@
 - With the repeated name check, I tried to create an alternate key into Name field to be able to do fast checks if name already exists in database. As seems that in-memory db has some limitations with UNIQUE contraints and searches through Alternate Keys (read in some comments on StackOverflow), I decided to simulate it with another parallel Set called AccountNames.
 - I created a TransactionLog Entity into another DbSet to store property changes logs. I only stored accounts ID's from buyers/sellers + a timestamp to be able to order them through time. I decided not to include buy/sell prices because that seems a bit too much info for the test purpose.
 
+- As a final point, I added a screenshoot of the postman tool with some of the request I deided to test the task. ![Postman](https://github.com/AlexandreAlberti/AltaProgrammingTest/blob/master/Postman.png)
+
 Again, thanks a lot for the chance to develop this a bit more and give a better idea how I can work with a stack I never used professionally before.
