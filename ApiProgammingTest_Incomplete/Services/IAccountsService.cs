@@ -6,7 +6,7 @@ namespace ApiProgrammingTest.Services
     {
         public IEnumerable<AccountInfo> Get();
         public AccountInfo Get(int id);
-        public void CreateAccount(string name);
+        public bool CreateAccount(string name);
         public bool UpdateAccountName(int id, string name);
         public bool UpdateAccountBalance(int id, decimal balance);
         public bool UpdateAccountProperties(int id, List<int> properties);

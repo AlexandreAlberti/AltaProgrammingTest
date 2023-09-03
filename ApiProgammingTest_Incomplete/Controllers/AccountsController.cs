@@ -34,9 +34,13 @@ namespace ApiProgrammingTest.Controllers
         }
 
         [HttpPost]
-        public void CreateAccount([FromBody] AccountInfo request)
+        public IActionResult CreateAccount([FromBody] AccountInfo request)
         {
-            accountService.CreateAccount(request.Name);
+            if (!accountService.CreateAccount(request.Name))
+            {
+                return NotFound();
+            }
+            return Ok();
         }
 
         [HttpPut("{id}")]
@@ -49,7 +53,7 @@ namespace ApiProgrammingTest.Controllers
                 return NotFound();
             }
             accountService.UpdateBalanceFromAccountUsingOwnedProperties(id);
-            if (accountService.UpdateAccountName(id, account.Name))
+            if (!accountService.UpdateAccountName(id, account.Name))
             {
                 return NotFound();
             }

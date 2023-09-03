@@ -75,6 +75,13 @@ namespace ApiProgrammingTest.Services
                 return false;
             }
 
+            context.TransactionLogs.Add(new TransactionLog
+            {
+                BuyerId = ownedBy,
+                SellerId = propertyFromDB.OwnedBy,
+                OperationTimestamp = System.DateTime.UtcNow
+            });
+
             propertyFromDB.OwnedBy = ownedBy;
             propertyFromDB.AvailableForPurchase = toPurchase;
 

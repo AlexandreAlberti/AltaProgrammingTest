@@ -147,7 +147,14 @@ namespace ApiProgrammingTest
                         SignUpTime = System.DateTime.Now,
                         Purchases = "5"
                     });
-
+                    context.AccountNames.Add(new AccountName
+                    {
+                        Name = "Alex"
+                    });
+                    context.AccountNames.Add(new AccountName
+                    {
+                        Name = "Alex Rich"
+                    });
                     context.SaveChanges();
                 }
             }

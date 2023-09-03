@@ -58,8 +58,13 @@ namespace ApiProgrammingTest.Services
             return Transform(context.Accounts.Find(id));
         }
 
-        public void CreateAccount(string name)
+        public bool CreateAccount(string name)
         {
+            if (UserNameExists(name))
+            {
+                return false;
+            }
+
             System.DateTime now = System.DateTime.UtcNow;
 
             AccountInfoDB newAccount = new AccountInfoDB()
@@ -70,22 +75,44 @@ namespace ApiProgrammingTest.Services
                 LastUpdateTime = now,
                 Purchases = ""
             };
-
             context.Accounts.Add(newAccount);
-
+            context.AccountNames.Add(new AccountName
+            {
+                Name = name
+            });
             context.SaveChanges();
+            return true;
+        }
+
+        private bool UserNameExists(string name)
+        {
+            AccountName nameFound =  context.AccountNames.Find(name);
+            return nameFound != null;
         }
 
         public bool UpdateAccountName(int id, string name)
         {
             AccountInfoDB existingAccount = context.Accounts.Find(id);
-
             if (existingAccount == null)
             {
                 return false;
             }
+            if (existingAccount.Name.Equals(name))
+            {
+                // No need of changes here
+                return true;
+            }
+            if (UserNameExists(name)) {
+                return false; // New name already exists out of current name for account
+            }
+            AccountName oldNameEntity = context.AccountNames.Find(existingAccount.Name);
+            context.AccountNames.Remove(oldNameEntity);
             existingAccount.Name = name;
             context.Accounts.Update(existingAccount);
+            context.AccountNames.Add(new AccountName
+            {
+                Name = name
+            });
             context.SaveChanges();
 
             return true;

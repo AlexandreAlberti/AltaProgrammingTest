@@ -42,6 +42,7 @@ namespace ApiProgrammingTest.Services
             purchases.Add(info.IdProperty);
             serviceAccounts.UpdateAccountBalanceAndProperties(account.Id, newBalance, purchases);
             serviceProperties.UpdatePropertyOwnership(property.Id, false, account.Id);
+
             return true;
         }
 
@@ -115,7 +116,6 @@ namespace ApiProgrammingTest.Services
             List<int> purchasesFromSeller = accountTo.Purchases;
             purchasesFromSeller.Add(property.Id);
             serviceAccounts.UpdateAccountBalanceAndProperties(accountTo.Id, newBalanceForBuyer, purchasesFromSeller);
-
             serviceProperties.UpdatePropertyOwnership(property.Id, false, accountTo.Id);
             return true;
         }
